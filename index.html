@@ -18,9 +18,10 @@
     <!-- date and heading -->
     <div class="row">
         <div class="col-sm-8" style="margin-left: auto; margin-right: auto;">
-            <h1>Work Day Scheduler</h1>
-            <p>Schedule your work</p>
-            <p id="today"></p>
+            <h1 style="font-size: 80px;">Work Day Scheduler</h1>
+            <p style="font-size: 15px;">A JavaScript based scheduler <br>Color Guide: Grey = Past Event, Red = Current event, Green = Future Event <br> Use the lock button to save your event </p>
+            <br>
+            <p style="font-size: 40px; text-align: center;"id="today"></p>
         </div>
     </div>
 
@@ -44,12 +45,11 @@
             });
             var tempHour = $("<div>").text(addHour(i));
             tempHour.attr({
-                class: "col-sm-1 align-middle pt-2 pb-2",
+                class: "col-sm-1 align-middle pt-4 pb-4",
                 style: "text-align:right;"
             });
-            var tempInput = $("<input>").attr({
-                type: "text",
-                class: "col-sm-10 pt-2 pb-2",
+            var tempInput = $("<textarea>").attr({
+                class: "col-sm-10",
                 id: i
             });
             addColor(tempInput);

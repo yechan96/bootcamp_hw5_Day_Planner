@@ -1,3 +1,5 @@
-input{
+textarea{
     border:0;
+    resize: none;
+    vertical-align: top;
 }
