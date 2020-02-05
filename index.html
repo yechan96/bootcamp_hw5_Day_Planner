@@ -19,7 +19,7 @@
     <div class="row">
         <div class="col-sm-8" style="margin-left: auto; margin-right: auto;">
             <h1 style="font-size: 80px;">Work Day Scheduler</h1>
-            <p style="font-size: 15px;">A JavaScript based scheduler <br>Color Guide: Grey = Past Event, Red = Current event, Green = Future Event <br> Use the lock button to save your event </p>
+            <p style="font-size: 15px;">A JavaScript based event scheduler <br>Color Guide: Grey = Past Event, Red = Current event, Green = Future Event <br> Use the lock button to save your event </p>
             <br>
             <p style="font-size: 40px; text-align: center;"id="today"></p>
         </div>
@@ -38,33 +38,31 @@
     $(document).ready(function(){
         var today = moment();
         $("#today").text(today.format("MMMM Do YYYY"));
+        var eventList = JSON.parse(localStorage.getItem("eventList")) || [];
 
-        for (var i=9; i<18;i++){
-            var tempHead = $("<div>").attr({
-                class: "row mb-2", 
-            });
-            var tempHour = $("<div>").text(addHour(i));
-            tempHour.attr({
-                class: "col-sm-1 align-middle pt-4 pb-4",
-                style: "text-align:right;"
-            });
-            var tempInput = $("<textarea>").attr({
-                class: "col-sm-10",
-                id: i
-            });
-            addColor(tempInput);
-            var tempBtn = $("<button>").attr({
-                class: "col-sm-1 btn btn-primary lock",
-                id: "btn"+i,
-                style: "border-top-left-radius:0px; border-bottom-left-radius:0px;"
-            }); 
-            var tempIcon = $("<span>").attr({
-                class: "fa fa-lock",
-            })
-            tempBtn.append(tempIcon);
-            tempHead.append(tempHour,tempInput,tempBtn);
-            $("#planner").append(tempHead);
+        if(eventList.length == 0){
+            propagateEmpty();
         }
+        else{
+            if(eventList.date < today.date() || eventList.month < today.month() ){
+                eventList = [];
+                localStorage.clear();
+                propagateEmpty();
+            }
+        }
+        refreshList();
+
+        $(document).on("click",".btn",function(){
+            var tempInput = $("#"+this.value);
+            var tempObj = {
+                    text: tempInput.val(),
+                    date: moment(),
+                    hour: this.value,
+            }
+            eventList[this.value-9] = tempObj;
+            localStorage.setItem("eventList", JSON.stringify(eventList));
+            refreshList();
+        });
 
         function addHour(hour){
             var temp = "";
@@ -92,6 +90,51 @@
                 slot.attr("style", "background-color: lightgrey");
             }
         }
+
+        function propagateEmpty(){
+            for (var i=9; i<18;i++){
+                var tempObj = {
+                    text: "",
+                    month: moment().month(),
+                    date: moment().date(),
+                    hour: i,
+                }
+                eventList.push(tempObj);
+            }
+        }
+
+        function refreshList(){
+            $("#planner").empty();
+            for (var i=0; i<eventList.length;i++){
+            var tempObj = eventList[i];
+            var tempHead = $("<div>").attr({
+                class: "row mb-2", 
+            });
+            var tempHour = $("<div>").text(addHour(tempObj.hour));
+            tempHour.attr({
+                class: "col-sm-1 align-middle pt-4 pb-4",
+                style: "text-align:right;"
+            });
+            var tempInput = $("<textarea>").attr({
+                class: "col-sm-10",
+                id: tempObj.hour,
+                placeholder: tempObj.text
+            });
+            addColor(tempInput);
+            var tempBtn = $("<button>").attr({
+                class: "col-sm-1 btn btn-primary lock",
+                id: "btn"+tempObj.hour,
+                style: "border-top-left-radius:0px; border-bottom-left-radius:0px;",
+                value: tempObj.hour
+            }); 
+            var tempIcon = $("<span>").attr({
+                class: "fa fa-lock",
+            })
+            tempBtn.append(tempIcon);
+            tempHead.append(tempHour,tempInput,tempBtn);
+            $("#planner").append(tempHead);
+            } //end of forloop
+        } //end of refresh
 
     })
 
